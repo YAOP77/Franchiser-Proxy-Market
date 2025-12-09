@@ -53,16 +53,16 @@ class ApiClient {
   async delete<T>(_endpoint: string, _options?: RequestInit): Promise<ApiResponse<T>> {
     throw new Error("API client not implemented - use axiosConfig instead");
   }
-}
+  }
 
-/**
+  /**
  * Utility function for error handling (placeholder)
- */
+   */
 export function handleApiError(_error: unknown): ApiError {
-  return {
-    message: "Une erreur est survenue",
-    status: 500,
-  };
+    return {
+      message: "Une erreur est survenue",
+      status: 500,
+    };
 }
 
 /**

@@ -313,14 +313,14 @@ export default function DeliveryPersonDetails() {
             </div>
 
             {/* Contact secondaire */}
-            <div>
+              <div>
               <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                Contact secondaire
-              </label>
+                  Contact secondaire
+                </label>
               <p className="text-xs font-medium text-neutral-600 dark:text-white">
                 {deliveryPerson.contact2 || "Non renseigné"}
-              </p>
-            </div>
+                </p>
+              </div>
 
             {/* Statut */}
             <div>
