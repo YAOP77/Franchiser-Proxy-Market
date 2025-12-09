@@ -53,3 +53,4 @@ Après le redéploiement, vérifiez que :
 Si votre API backend ne supporte pas encore HTTPS, vous devrez :
 1. Configurer un certificat SSL sur votre serveur API
 2. Ou utiliser un proxy HTTPS (comme Cloudflare) devant votre API
+
