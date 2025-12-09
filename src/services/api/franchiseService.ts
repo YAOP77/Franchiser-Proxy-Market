@@ -486,12 +486,13 @@ const franchiseService = {
         }
         
         // Message d'erreur générique
-        const errorMessage = 
+        const rawErrorMessage = 
           apiError?.message || 
           apiError?.error || 
           apiError?.msg ||
           (status ? `Erreur ${status}: ${axiosError.response?.statusText}` : "Erreur lors de la création de la boutique");
-        return { success: false, error: errorMessage || "Erreur lors de la création de la boutique" };
+        const errorMessage = typeof rawErrorMessage === 'string' ? rawErrorMessage : "Erreur lors de la création de la boutique";
+        return { success: false, error: errorMessage };
       }
       
       // Erreur réseau ou autre
@@ -667,12 +668,13 @@ const franchiseService = {
         }
         
         // Message d'erreur générique
-        const errorMessage = 
+        const rawErrorMessage = 
           apiError?.message || 
           apiError?.error || 
           apiError?.msg ||
           (status ? `Erreur ${status}: ${axiosError.response?.statusText}` : "Erreur lors de la modification de la boutique");
-        throw new Error(errorMessage || "Erreur lors de la modification de la boutique");
+        const errorMessage = typeof rawErrorMessage === 'string' ? rawErrorMessage : "Erreur lors de la modification de la boutique";
+        throw new Error(errorMessage);
       }
       
       // Erreur réseau ou autre

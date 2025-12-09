@@ -721,5 +721,4 @@ const orderService = {
 };
 
 export default orderService;
-export type { Order, OrderUser, OrderProduct, OrderStatus, GetOrdersResponse, OrderDetail, AvailableDeliveryPerson, AssignedDeliveryPerson, DeliveryAddress };
 
