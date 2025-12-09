@@ -24,7 +24,7 @@ import { Boutique } from "../../../services/api/franchiseService";
 
 interface FranchisesTableProps {
   boutiques: Boutique[];
-  onAddFranchise?: (boutique: Boutique, e: React.MouseEvent) => void;
+  onAddFranchise?: (boutique: Boutique, e?: React.MouseEvent) => void;
 }
 
 /**
@@ -90,7 +90,7 @@ export default function FranchisesTable({ boutiques, onAddFranchise }: Franchise
             <Button
               variant="none"
               size="sm"
-              onClick={(e) => onAddFranchise(boutique, e)}
+              onClick={() => onAddFranchise(boutique)}
               className="bg-[#04b05d] hover:bg-[#039a52] text-white shadow-theme-xs disabled:bg-[#04b05d]/70 focus:ring-3 focus:ring-[#04b05d]/20 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Placer un franchisé"
             >

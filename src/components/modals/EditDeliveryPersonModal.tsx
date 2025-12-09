@@ -339,9 +339,8 @@ export default function EditDeliveryPersonModal({
                   Statut <span className="text-error-500">*</span>
                 </Label>
                 <Select
-                  id="edit-status"
                   value={status}
-                  onChange={(value) => setStatus(value)}
+                  onChange={(value: string) => setStatus(value)}
                   options={statusOptions}
                   placeholder="Sélectionner un statut"
                 />

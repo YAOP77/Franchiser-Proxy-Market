@@ -490,14 +490,15 @@ const deliveryService = {
 
       // Cas 5: Vérifier si la réponse contient un tableau vide mais avec une structure valide
       if (response.data.data && Array.isArray(response.data.data)) {
+        const dataIsEmpty = response.data.data.length === 0;
         return {
           data: response.data.data,
           meta: response.data.meta || {
             current_page: page,
-            from: isEmpty ? null : 1,
+            from: dataIsEmpty ? null : 1,
             last_page: 1,
             per_page: response.data.data.length,
-            to: isEmpty ? null : response.data.data.length,
+            to: dataIsEmpty ? null : response.data.data.length,
             total: response.data.meta?.total || 0,
           },
           links: response.data.links || {

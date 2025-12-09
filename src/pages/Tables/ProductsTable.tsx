@@ -38,10 +38,10 @@ export default function ProductsTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [paginationMeta, setPaginationMeta] = useState<{
     current_page: number;
-    from: number;
+    from: number | null;
     last_page: number;
     per_page: number;
-    to: number;
+    to: number | null;
     total: number;
   } | null>(null);
 

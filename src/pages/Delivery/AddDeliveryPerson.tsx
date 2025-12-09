@@ -333,11 +333,9 @@ export default function AddDeliveryPerson() {
                 </Label>
                 <Input
                   type="tel"
-                  id="contact1"
                   placeholder="Ex: 0123456789"
                   value={contact1}
                   onChange={(e) => setContact1(e.target.value)}
-                  maxLength={10}
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   10 chiffres requis
@@ -350,9 +348,8 @@ export default function AddDeliveryPerson() {
                   Statut <span className="text-error-500">*</span>
                 </Label>
                 <Select
-                  id="status"
                   value={status}
-                  onChange={(value) => setStatus(value)}
+                  onChange={(value: string) => setStatus(value)}
                   options={statusOptions}
                   placeholder="Sélectionner un statut"
                 />

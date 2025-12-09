@@ -14,7 +14,7 @@ import Alert from "../ui/alert/Alert";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import adminService, { Admin, UpdateAdminData, Commune } from "../../services/api/adminService";
 import { cleanPhoneNumber, validatePhoneNumber } from "../../utils/phoneUtils";
-import { validateEmail, validatePositiveInteger } from "../../utils/validationUtils";
+import { validateEmail } from "../../utils/validationUtils";
 
 interface PasswordFieldProps {
   value: string;
@@ -66,13 +66,12 @@ export default function EditAdminModal({
   const [password, setPassword] = useState("");
   const [contact1, setContact1] = useState("");
   const [contact2, setContact2] = useState("");
-  const [role, setRole] = useState<"admin" | "caissier" | "commercial" | "">("");
+  const [role, setRole] = useState<"admin" | "caissier" | "commercial" | "super_admin" | "">("");
   const [communeId, setCommuneId] = useState<string>("");
   const [adresse, setAdresse] = useState("");
   const [status, setStatus] = useState("");
 
-  // État pour l'affichage du mot de passe
-  const [showPassword, setShowPassword] = useState(false);
+  // État pour l'affichage du mot de passe (géré par PasswordField)
 
   // État pour les alertes
   const [showWarningAlert, setShowWarningAlert] = useState(false);
@@ -97,7 +96,8 @@ export default function EditAdminModal({
       setPassword("");
       setContact1(admin.contact_1 || "");
       setContact2(admin.contact_2 || "");
-      setRole(admin.role || "");
+      const adminRole = admin.role as "admin" | "caissier" | "commercial" | "super_admin" | "";
+      setRole(adminRole || "");
       // S'assurer que commune_id est bien converti en string
       const adminCommuneId = admin.commune_id;
       if (adminCommuneId !== null && adminCommuneId !== undefined) {
@@ -280,7 +280,7 @@ export default function EditAdminModal({
         prenoms: trimmedPrenoms,
         email: trimmedEmail.toLowerCase(),
         contact_1: cleanedContact1,
-        role: role as "admin" | "caissier" | "commercial",
+        role: (role === "super_admin" ? "admin" : role) as "admin" | "caissier" | "commercial",
         commune_id: parsedCommuneId,
         adresse: trimmedAdresse,
         status: apiStatus, // "1" pour actif, "0" pour inactif
@@ -336,7 +336,8 @@ export default function EditAdminModal({
       setPassword("");
       setContact1(admin.contact_1 || "");
       setContact2(admin.contact_2 || "");
-      setRole(admin.role || "");
+      const adminRole = admin.role as "admin" | "caissier" | "commercial" | "super_admin" | "";
+      setRole(adminRole || "");
       // S'assurer que commune_id est bien converti en string
       const adminCommuneId = admin.commune_id;
       if (adminCommuneId !== null && adminCommuneId !== undefined) {
@@ -490,9 +491,8 @@ export default function EditAdminModal({
                 Rôle <span className="text-error-500">*</span>
               </Label>
               <Select
-                id="edit-role"
                 value={role}
-                onChange={(value) => setRole(value as "admin" | "caissier" | "commercial" | "")}
+                onChange={(value: string) => setRole(value as "admin" | "caissier" | "commercial" | "super_admin" | "")}
                 options={roleOptions}
                 placeholder="Sélectionnez un rôle"
               />
@@ -503,9 +503,8 @@ export default function EditAdminModal({
                 Commune <span className="text-error-500">*</span>
               </Label>
               <Select
-                id="edit-commune"
                 value={communeId}
-                onChange={(value) => setCommuneId(value)}
+                onChange={(value: string) => setCommuneId(value)}
                 options={communeOptions}
                 placeholder={isLoadingCommunes ? "Chargement..." : "Sélectionnez une commune"}
               />
@@ -529,9 +528,8 @@ export default function EditAdminModal({
                 Status <span className="text-error-500">*</span>
               </Label>
               <Select
-                id="edit-status"
                 value={status}
-                onChange={(value) => setStatus(value)}
+                onChange={(value: string) => setStatus(value)}
                 options={statusOptions}
                 placeholder="Sélectionnez un status"
               />
@@ -549,7 +547,7 @@ export default function EditAdminModal({
             </Button>
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
             >
@@ -565,7 +563,7 @@ export default function EditAdminModal({
               isWarningAlertVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            <Alert variant="warning" message="Tous les champs sont requis" />
+            <Alert variant="warning" title="Attention" message="Tous les champs sont requis" />
           </div>
         )}
 
@@ -576,7 +574,7 @@ export default function EditAdminModal({
               isSuccessAlertVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            <Alert variant="success" message="Administrateur modifié avec succès" />
+            <Alert variant="success" title="Succès" message="Administrateur modifié avec succès" />
           </div>
         )}
       </div>

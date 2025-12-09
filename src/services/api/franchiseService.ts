@@ -237,19 +237,19 @@ const franchiseService = {
           throw new Error("Endpoint non trouvé. Veuillez contacter l'administrateur.");
         }
         
-        const errorMessage = axiosError.response?.data?.message 
+        const rawErrorMessage = axiosError.response?.data?.message 
           || axiosError.response?.data?.error 
           || axiosError.response?.data?.msg
           || `Erreur ${status || 'inconnue'}: ${axiosError.response?.statusText || 'Une erreur est survenue'}`;
-        
+        const errorMessage = typeof rawErrorMessage === 'string' ? rawErrorMessage : "Erreur lors de la récupération des boutiques";
         throw new Error(errorMessage);
       }
       
       // Erreur réseau ou autre
-      const errorMessage = error instanceof Error 
+      const networkErrorMessage = error instanceof Error 
         ? error.message 
         : "Erreur lors de la récupération des boutiques";
-      throw new Error(errorMessage);
+      throw new Error(networkErrorMessage);
     }
   },
 
@@ -281,7 +281,7 @@ const franchiseService = {
       
       // Si la réponse est directement l'objet boutique
       if (responseData.id && typeof responseData.id === 'string') {
-        return responseData as Boutique;
+        return responseData as unknown as Boutique;
       }
       
       throw new Error("Structure de réponse API non reconnue");
@@ -311,19 +311,19 @@ const franchiseService = {
           throw new Error("Boutique non trouvée.");
         }
         
-        const errorMessage = axiosError.response?.data?.message 
+        const rawErrorMsg = axiosError.response?.data?.message 
           || axiosError.response?.data?.error 
           || axiosError.response?.data?.msg
           || `Erreur ${status || 'inconnue'}: ${axiosError.response?.statusText || 'Une erreur est survenue'}`;
-        
+        const errorMessage = typeof rawErrorMsg === 'string' ? rawErrorMsg : "Erreur lors de la récupération des détails de la boutique";
         throw new Error(errorMessage);
       }
       
       // Erreur réseau ou autre
-      const errorMessage = error instanceof Error 
+      const networkErrorMsg = error instanceof Error 
         ? error.message 
         : "Erreur lors de la récupération des détails de la boutique";
-      throw new Error(errorMessage);
+      throw new Error(networkErrorMsg);
     }
   },
 

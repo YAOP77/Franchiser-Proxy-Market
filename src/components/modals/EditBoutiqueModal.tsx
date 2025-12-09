@@ -10,7 +10,8 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Select from "../form/Select";
 import Button from "../ui/button/Button";
-import Alert from "../ui/alert/Alert";
+// Alert component imported for potential future use
+// import Alert from "../ui/alert/Alert";
 import GoogleMapPicker from "../maps/GoogleMapPicker";
 import franchiseService, { Boutique, UpdateBoutiqueData } from "../../services/api/franchiseService";
 import { adminService, Commune } from "../../services/api/adminService";
@@ -420,12 +421,10 @@ export default function EditBoutiqueModal({
                 </div>
               ) : (
                 <Select
-                  id="edit-commune"
                   options={communeOptions}
                   value={communeId}
-                  onChange={(value) => setCommuneId(value)}
+                  onChange={(value: string) => setCommuneId(value)}
                   placeholder="Sélectionnez une commune"
-                  disabled={isLoadingCommunes || isLoading}
                 />
               )}
             </div>
@@ -435,12 +434,10 @@ export default function EditBoutiqueModal({
                 Statut <span className="text-error-500">*</span>
               </Label>
               <Select
-                id="edit-status"
                 options={statusOptions}
                 value={status}
-                onChange={(value) => setStatus(value)}
+                onChange={(value: string) => setStatus(value)}
                 placeholder="Sélectionnez un statut"
-                disabled={isLoading}
               />
             </div>
           </div>

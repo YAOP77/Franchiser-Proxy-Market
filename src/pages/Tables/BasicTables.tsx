@@ -75,10 +75,8 @@ export default function BasicTables() {
   /**
    * Gère le clic sur le bouton "Placer un franchisé"
    * @param boutique - La boutique pour laquelle créer un franchisé
-   * @param e - L'événement de clic
    */
-  const handleAddFranchise = (boutique: Boutique, e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêcher la navigation vers les détails
+  const handleAddFranchise = (boutique: Boutique) => {
     // Rediriger vers le formulaire de création de franchisé avec l'ID de la boutique
     navigate(`/add-boutique-user?boutique_id=${boutique.id}`);
   };

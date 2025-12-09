@@ -317,10 +317,9 @@ const EditBoutiqueUserModal = ({
             </label>
             <Select
               value={String(formData.commune_id)}
-              onChange={(e) => handleChange("commune_id", e.target.value)}
+              onChange={(value: string) => handleChange("commune_id", value)}
               options={communeOptions}
               placeholder={isLoadingCommunes ? "Chargement..." : "Sélectionnez une commune"}
-              disabled={isSubmitting || isLoadingCommunes}
             />
             {validationErrors.commune_id && (
               <p className="text-sm text-red-600 mt-1">{validationErrors.commune_id}</p>
@@ -351,9 +350,8 @@ const EditBoutiqueUserModal = ({
             </label>
             <Select
               value={String(formData.status)}
-              onChange={(e) => handleChange("status", Number(e.target.value))}
+              onChange={(value: string) => handleChange("status", Number(value))}
               options={statusOptions}
-              disabled={isSubmitting}
             />
           </div>
         </div>

@@ -23,7 +23,7 @@ export default function DeliveryPersonDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [_isDeleting, _setIsDeleting] = useState<boolean>(false);
 
   /**
    * Charger les détails du livreur depuis l'API
