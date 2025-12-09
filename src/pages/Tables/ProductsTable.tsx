@@ -260,8 +260,8 @@ export default function ProductsTable() {
             onPageChange={handlePageChange}
             totalItems={paginationMeta.total}
             itemsPerPage={paginationMeta.per_page}
-            showingFrom={paginationMeta.from}
-            showingTo={paginationMeta.to}
+            showingFrom={paginationMeta.from ?? undefined}
+            showingTo={paginationMeta.to ?? undefined}
           />
         )}
       </div>

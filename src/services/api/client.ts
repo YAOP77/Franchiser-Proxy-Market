@@ -2,7 +2,7 @@
  * Client API pour Proxy Market Dashboard
  * 
  * Ce fichier prépare la structure pour l'intégration des API REST.
- * Le client sera implémenté lors de l'intégration des APIs.
+ * Note: Ce client n'est pas utilisé actuellement - voir axiosConfig.ts pour le client actif.
  */
 
 import { API_CONFIG } from "../../config/constants";
@@ -10,22 +10,19 @@ import type { ApiResponse, ApiError } from "../../types";
 
 /**
  * Configuration du client API
+ * @deprecated Utilisez axiosConfig.ts à la place
  */
 class ApiClient {
-  private _baseURL: string;
-  private _timeout: number;
-
   constructor() {
-    this._baseURL = API_CONFIG.baseURL;
-    this._timeout = API_CONFIG.timeout;
+    // Configuration stockée dans API_CONFIG
+    void API_CONFIG;
   }
 
   /**
    * Méthode générique pour les requêtes GET
    */
   async get<T>(_endpoint: string, _options?: RequestInit): Promise<ApiResponse<T>> {
-    // TODO: Implémenter lors de l'intégration des APIs
-    throw new Error("API client not implemented yet");
+    throw new Error("API client not implemented - use axiosConfig instead");
   }
 
   /**
@@ -36,8 +33,7 @@ class ApiClient {
     _data?: unknown,
     _options?: RequestInit
   ): Promise<ApiResponse<T>> {
-    // TODO: Implémenter lors de l'intégration des APIs
-    throw new Error("API client not implemented yet");
+    throw new Error("API client not implemented - use axiosConfig instead");
   }
 
   /**
@@ -48,31 +44,29 @@ class ApiClient {
     _data?: unknown,
     _options?: RequestInit
   ): Promise<ApiResponse<T>> {
-    // TODO: Implémenter lors de l'intégration des APIs
-    throw new Error("API client not implemented yet");
+    throw new Error("API client not implemented - use axiosConfig instead");
   }
 
   /**
    * Méthode générique pour les requêtes DELETE
    */
   async delete<T>(_endpoint: string, _options?: RequestInit): Promise<ApiResponse<T>> {
-    // TODO: Implémenter lors de l'intégration des APIs
-    throw new Error("API client not implemented yet");
-  }
-
-  /**
-   * Gestion des erreurs API
-   */
-  private _handleError(_error: unknown): ApiError {
-    // TODO: Implémenter la gestion d'erreurs lors de l'intégration
-    return {
-      message: "Une erreur est survenue",
-      status: 500,
-    };
+    throw new Error("API client not implemented - use axiosConfig instead");
   }
 }
 
 /**
+ * Utility function for error handling (placeholder)
+ */
+export function handleApiError(_error: unknown): ApiError {
+  return {
+    message: "Une erreur est survenue",
+    status: 500,
+  };
+}
+
+/**
  * Instance singleton du client API
+ * @deprecated Utilisez axiosConfig.ts à la place
  */
 export const apiClient = new ApiClient();

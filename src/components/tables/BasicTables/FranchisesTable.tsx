@@ -92,7 +92,6 @@ export default function FranchisesTable({ boutiques, onAddFranchise }: Franchise
               size="sm"
               onClick={() => onAddFranchise(boutique)}
               className="bg-[#04b05d] hover:bg-[#039a52] text-white shadow-theme-xs disabled:bg-[#04b05d]/70 focus:ring-3 focus:ring-[#04b05d]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Placer un franchisé"
             >
               Placer un franchisé
             </Button>

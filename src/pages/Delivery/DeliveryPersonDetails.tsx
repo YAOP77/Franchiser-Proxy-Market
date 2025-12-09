@@ -23,7 +23,7 @@ export default function DeliveryPersonDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [_isDeleting, _setIsDeleting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   /**
    * Charger les détails du livreur depuis l'API
@@ -265,10 +265,10 @@ export default function DeliveryPersonDetails() {
           <Button
             variant="outline"
             onClick={handleDelete}
-            disabled={true}
+            disabled={isDeleting}
         >
             <TrashBinIcon className="mr-2 h-4 w-4" />
-            Supprimer
+            {isDeleting ? "Suppression..." : "Supprimer"}
         </Button>
         </div>
       </div>

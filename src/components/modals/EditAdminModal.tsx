@@ -108,12 +108,13 @@ export default function EditAdminModal({
       setAdresse(admin.adresse || "");
       // Convertir le status de number (1/0) ou string vers "actif"/"inactif" pour le formulaire
       if (admin.status !== null && admin.status !== undefined) {
-        if (typeof admin.status === 'number') {
+        const statusValue = admin.status;
+        if (typeof statusValue === 'number') {
           // Si c'est un number, 1 = actif, 0 = inactif
-          setStatus(admin.status === 1 ? "actif" : "inactif");
-        } else if (typeof admin.status === 'string') {
+          setStatus(statusValue === 1 ? "actif" : "inactif");
+        } else if (typeof statusValue === 'string') {
           // Si c'est une string, vérifier si c'est "1" ou "actif"
-          const statusStr = admin.status.toLowerCase().trim();
+          const statusStr = statusValue.toLowerCase().trim();
           if (statusStr === "1" || statusStr === "actif") {
             setStatus("actif");
           } else {
@@ -348,12 +349,13 @@ export default function EditAdminModal({
       setAdresse(admin.adresse || "");
       // Convertir le status de number (1/0) ou string vers "actif"/"inactif" pour le formulaire
       if (admin.status !== null && admin.status !== undefined) {
-        if (typeof admin.status === 'number') {
+        const statusValue = admin.status;
+        if (typeof statusValue === 'number') {
           // Si c'est un number, 1 = actif, 0 = inactif
-          setStatus(admin.status === 1 ? "actif" : "inactif");
-        } else if (typeof admin.status === 'string') {
+          setStatus(statusValue === 1 ? "actif" : "inactif");
+        } else if (typeof statusValue === 'string') {
           // Si c'est une string, vérifier si c'est "1" ou "actif"
-          const statusStr = admin.status.toLowerCase().trim();
+          const statusStr = statusValue.toLowerCase().trim();
           if (statusStr === "1" || statusStr === "actif") {
             setStatus("actif");
           } else {
