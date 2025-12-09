@@ -14,7 +14,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResp
 // Pour Vite, les variables doivent être préfixées par VITE_
 // Note: Les fichiers .env ne doivent PAS avoir de guillemets ni de point-virgule
 // URL de l'API de la boutique - Peut être surchargée via la variable d'environnement VITE_API_BASE_URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://boutique-api.proxymarketapp.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://boutique-api.proxymarketapp.com/api";
 
 /**
  * Instance axios configurée pour l'application

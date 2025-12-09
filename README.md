@@ -82,7 +82,7 @@ Boutique Proxy Market est une application web moderne développée en React et T
    
    Créer un fichier `.env` à la racine du projet avec les variables suivantes :
    ```env
-   VITE_API_BASE_URL=http://boutique-api.proxymarketapp.com/api
+   VITE_API_BASE_URL=https://boutique-api.proxymarketapp.com/api
    ```
 
 4. **Démarrer le serveur de développement**
