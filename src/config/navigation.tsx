@@ -21,7 +21,10 @@ export const mainNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/",
+    subItems: [
+      { name: "Tableau de bord", path: "/" },
+      { name: "Statistique", path: "/statistics" },
+    ],
   },
   {
     name: "Gestion des produits",

@@ -64,10 +64,10 @@ Boutique Proxy Market est une application web moderne développée en React et T
 ## 🚀 Installation
 
 1. **Cloner le dépôt**
-   ```bash
+```bash
    git clone <url-du-repo>
    cd Boutique_Proxy_Market
-   ```
+```
 
 2. **Installer les dépendances**
    ```bash
@@ -75,7 +75,7 @@ Boutique Proxy Market est une application web moderne développée en React et T
    # ou
    yarn install
    ```
-   
+
    > 💡 Si vous rencontrez des problèmes lors de l'installation, utilisez le flag `--legacy-peer-deps`
 
 3. **Configurer les variables d'environnement**

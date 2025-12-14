@@ -108,7 +108,7 @@ export default function EditAdminModal({
       setAdresse(admin.adresse || "");
       // Convertir le status de number (1/0) vers "actif"/"inactif" pour le formulaire
       // admin.status est toujours un number selon l'interface Admin
-      setStatus(admin.status === 1 ? "actif" : "inactif");
+          setStatus(admin.status === 1 ? "actif" : "inactif");
       setError("");
       setShowWarningAlert(false);
       setShowSuccessAlert(false);
@@ -331,7 +331,7 @@ export default function EditAdminModal({
       }
       setAdresse(admin.adresse || "");
       // Convertir le status de number (1/0) vers "actif"/"inactif" pour le formulaire
-      setStatus(admin.status === 1 ? "actif" : "inactif");
+          setStatus(admin.status === 1 ? "actif" : "inactif");
     }
     setError("");
     setShowWarningAlert(false);

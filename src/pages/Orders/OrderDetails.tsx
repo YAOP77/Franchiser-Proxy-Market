@@ -60,11 +60,13 @@ export default function OrderDetails() {
   }, [orderId]);
 
   /**
-   * Normalise le texte du statut (remplace "Commande En cours de préparation" par "En cours de préparation")
+   * Normalise le texte du statut (remplace "Commande En cours de préparation" par "En cours de préparation" et "Commande en attente de paiement" par "En attente de paiement")
    */
   const normalizeStatusText = (statusText: string | undefined): string => {
     if (!statusText) return "En attente";
-    return statusText.replace(/Commande\s+En\s+cours\s+de\s+préparation/gi, 'En cours de préparation');
+    let normalized = statusText.replace(/Commande\s+En\s+cours\s+de\s+préparation/gi, 'En cours de préparation');
+    normalized = normalized.replace(/Commande\s+en\s+attente\s+de\s+paiement/gi, 'En attente de paiement');
+    return normalized;
   };
 
   /**
@@ -78,6 +80,19 @@ export default function OrderDetails() {
                              status.includes('pending payment') ||
                              statusText === 'Commande en attente de paiement';
     
+    // Vérifier si c'est "Commande payée"
+    const isPaid = status.includes('payée') || 
+                   status.includes('paid') ||
+                   statusText === 'Commande payée';
+    
+    // "Commande payée" - couleur blue avec bordure (même style que OrdersList)
+    if (isPaid) {
+      return { 
+        color: 'bg-blue-100 border border-blue-600 text-blue-800 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-200',
+        hasBorder: true
+      };
+    }
+    
     if (status.includes('livré') || status.includes('delivered')) {
       return { color: 'bg-green-100 border border-green-500 text-green-800 dark:bg-green-900/30 dark:border-green-500 dark:text-green-200', hasBorder: true };
     }
@@ -90,7 +105,7 @@ export default function OrderDetails() {
     if (status.includes('attente') || status.includes('pending')) {
       if (isPendingPayment) {
         return { 
-          color: 'bg-yellow-100 border border-yellow-400 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-200',
+          color: 'bg-yellow-200 border border-yellow-600 text-yellow-800 dark:bg-yellow-900/40 dark:border-yellow-600 dark:text-yellow-200',
           hasBorder: true
         };
       }
@@ -107,9 +122,24 @@ export default function OrderDetails() {
   };
 
   /**
+   * Vérifie si la commande est en attente de paiement
+   */
+  const isPendingPayment = (): boolean => {
+    if (!orderDetail?.status_text) return false;
+    const status = orderDetail.status_text.toLowerCase();
+    return status.includes('attente de paiement') || 
+           status.includes('pending payment') ||
+           orderDetail.status_text === 'Commande en attente de paiement';
+  };
+
+  /**
    * Ouvre le modal d'attribution à un livreur
    */
   const handlePrepare = () => {
+    // Ne pas permettre la préparation si la commande est en attente de paiement
+    if (isPendingPayment()) {
+      return;
+    }
     setAssignmentError("");
     setAssignmentSuccess("");
     setShowAssignModal(true);
@@ -281,14 +311,26 @@ export default function OrderDetails() {
         <div className="p-4 sm:p-6">
           {/* Première ligne - Informations principales */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div>
+            {/* ID de la commande */}
+            {orderDetail.id && (
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Identifiant
+                </label>
+                <p className="text-xs font-semibold text-neutral-600 dark:text-white">
+                  {String(orderDetail.id)}
+                </p>
+              </div>
+            )}
+
+            <div>
               <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-              Numéro de commande
-            </label>
+                Numéro de commande
+              </label>
               <p className="text-xs font-semibold text-neutral-600 dark:text-white">
-              {orderDetail.numero || orderDetail.id}
-            </p>
-          </div>
+                {orderDetail.numero || orderDetail.id}
+              </p>
+            </div>
 
           <div>
               <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
@@ -328,49 +370,43 @@ export default function OrderDetails() {
 
           {/* Deuxième ligne - Informations financières et paiement */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-neutral-200 dark:border-gray-700">
-            {orderDetail.soustotal && (
-              <div>
-                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                  Sous-total
-                </label>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-white">
-                  {orderDetail.soustotal}
-                </p>
-              </div>
-            )}
+            <div>
+              <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                Sous-total
+              </label>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-white">
+                {orderDetail.soustotal || (orderDetail.soustotal_or ? `${orderDetail.soustotal_or.toLocaleString('fr-FR')} FCFA` : "0 FCFA")}
+              </p>
+            </div>
 
-            {orderDetail.frais_livraison && (
-              <div>
-                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                  Frais de livraison
-            </label>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-white">
-                  {orderDetail.frais_livraison}
-            </p>
-          </div>
-        )}
+            <div>
+              <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                Frais de livraison
+              </label>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-white">
+                {orderDetail.frais_livraison || (orderDetail.frais_livraison_or ? `${orderDetail.frais_livraison_or.toLocaleString('fr-FR')} FCFA` : "0 FCFA")}
+              </p>
+            </div>
 
             <div>
               <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
                 Total
               </label>
               <p className="text-xs font-bold text-neutral-600 dark:text-white">
-                {orderDetail.total || "0 FCFA"}
+                {orderDetail.total || (orderDetail.total_or ? `${orderDetail.total_or.toLocaleString('fr-FR')} FCFA` : "0 FCFA")}
               </p>
             </div>
           </div>
 
-          {/* Mode de paiement si disponible */}
-        {orderDetail.modepaiement && (
-            <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-gray-700">
-              <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+          {/* Mode de paiement */}
+          <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-gray-700">
+            <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
               Mode de paiement
             </label>
-              <p className="text-sm font-medium text-neutral-600 dark:text-white">
-              {orderDetail.modepaiement}
+            <p className="text-sm font-medium text-neutral-600 dark:text-white">
+              {orderDetail.modepaiement || "Non renseigné"}
             </p>
           </div>
-        )}
         </div>
       </div>
 
@@ -384,6 +420,18 @@ export default function OrderDetails() {
           </div>
           <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* ID du client */}
+              {orderDetail.client.id && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Identifiant
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {String(orderDetail.client.id)}
+                  </p>
+                </div>
+              )}
+
               {/* Nom complet */}
               {(orderDetail.client.nom || orderDetail.client.prenoms) && (
                 <div>
@@ -391,7 +439,7 @@ export default function OrderDetails() {
                     Nom complet
                   </label>
                   <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {[orderDetail.client.nom, orderDetail.client.prenoms]
+                    {[orderDetail.client.prenoms, orderDetail.client.nom]
                       .filter(Boolean)
                       .join(" ") || "Non renseigné"}
                   </p>
@@ -399,40 +447,34 @@ export default function OrderDetails() {
               )}
 
               {/* Email */}
-              {orderDetail.client.email && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Email
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.client.email}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Email
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.client.email || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Contact principal */}
-              {orderDetail.client.contact1 && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Contact principal
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.client.contact1}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Contact principal
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.client.contact1 || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Contact secondaire */}
-              {orderDetail.client.contact2 && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Contact secondaire
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.client.contact2}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Contact secondaire
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.client.contact2 || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Statut du client */}
               {orderDetail.client.status !== undefined && (
@@ -451,6 +493,44 @@ export default function OrderDetails() {
                   </div>
                 </div>
               )}
+
+              {/* Adresse du client */}
+              {orderDetail.client.adresse && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Adresse
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.client.adresse}
+                  </p>
+                </div>
+              )}
+
+              {/* Localisation du client */}
+              {orderDetail.client.location_name && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Localisation
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.client.location_name}
+                  </p>
+                </div>
+              )}
+
+              {/* Coordonnées GPS du client */}
+              {(orderDetail.client.latitude || orderDetail.client.longitude) && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Coordonnées GPS
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.client.latitude && orderDetail.client.longitude
+                      ? `${orderDetail.client.latitude}, ${orderDetail.client.longitude}`
+                      : orderDetail.client.latitude || orderDetail.client.longitude || "Non disponible"}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -466,6 +546,18 @@ export default function OrderDetails() {
           </div>
           <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* ID du livreur */}
+              {orderDetail.livreur.id && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Identifiant
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {String(orderDetail.livreur.id)}
+                  </p>
+                </div>
+              )}
+
               {/* Nom complet */}
               {(orderDetail.livreur.nom || orderDetail.livreur.prenoms) && (
                 <div>
@@ -473,7 +565,7 @@ export default function OrderDetails() {
                     Nom complet
                   </label>
                   <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {[orderDetail.livreur.nom, orderDetail.livreur.prenoms]
+                    {[orderDetail.livreur.prenoms, orderDetail.livreur.nom]
                       .filter(Boolean)
                       .join(" ") || "Non renseigné"}
                   </p>
@@ -481,40 +573,34 @@ export default function OrderDetails() {
               )}
 
               {/* Email */}
-              {orderDetail.livreur.email && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Email
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.livreur.email}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Email
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.livreur.email || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Contact principal */}
-              {orderDetail.livreur.contact1 && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Contact principal
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.livreur.contact1}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Contact principal
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.livreur.contact1 || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Contact secondaire */}
-              {orderDetail.livreur.contact2 && (
-                <div>
-                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                    Contact secondaire
-                  </label>
-                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                    {orderDetail.livreur.contact2}
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                  Contact secondaire
+                </label>
+                <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                  {orderDetail.livreur.contact2 || "Non renseigné"}
+                </p>
+              </div>
 
               {/* Statut du livreur */}
               {orderDetail.livreur.status !== undefined && (
@@ -552,99 +638,107 @@ export default function OrderDetails() {
                 {orderDetail.adresse_livraison}
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Adresse principale */}
-                {orderDetail.adresse_livraison.adresse && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* ID de l'adresse */}
+                {orderDetail.adresse_livraison.id && (
                   <div>
                     <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                      Adresse
+                      Identifiant
                     </label>
                     <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
-                      {orderDetail.adresse_livraison.adresse}
+                      {String(orderDetail.adresse_livraison.id)}
                     </p>
                   </div>
                 )}
+
+                {/* Adresse principale */}
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Adresse
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.adresse_livraison.adresse || "Non renseigné"}
+                  </p>
+                </div>
 
                 {/* Nom de la localisation */}
-                {orderDetail.adresse_livraison.location_name && (
-                  <div>
-                    <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                      Localisation
-                    </label>
-                    <p className="mt-1  bg-yellow-200 w-24 px-2 border border-yellow-500 rounded-full text-xs font-medium text-neutral-600 dark:text-neutral-800">
-                      {orderDetail.adresse_livraison.location_name}
-                    </p>
-                  </div>
-                )}
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Localisation
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.adresse_livraison.location_name || "Non renseigné"}
+                  </p>
+                </div>
 
                 {/* Détails de l'adresse */}
-                {orderDetail.adresse_livraison.adresse_detail && (
-                  <div>
-                    <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                      Détails de l'adresse
-                    </label>
-                    <p className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">
-                      {orderDetail.adresse_livraison.adresse_detail}
-                    </p>
-                  </div>
-                )}
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Détails de l'adresse
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.adresse_livraison.adresse_detail || "Non renseigné"}
+                  </p>
+                </div>
 
                 {/* Commune */}
-                {orderDetail.adresse_livraison.commune && (
+                <div>
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Commune
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.adresse_livraison.commune || "Non renseigné"}
+                  </p>
+                </div>
+
+                {/* ID de la commune */}
+                {orderDetail.adresse_livraison.commune_id && (
                   <div>
                     <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                      Commune
+                      ID Commune
                     </label>
-                    <p className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">
-                      {orderDetail.adresse_livraison.commune}
+                    <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                      {String(orderDetail.adresse_livraison.commune_id)}
                     </p>
                   </div>
                 )}
 
                 {/* Coordonnées GPS */}
-                {(orderDetail.adresse_livraison.latitude || orderDetail.adresse_livraison.longitude) && (
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
-                      Coordonnées GPS
-                    </label>
-                    <p className="mt-1 text-xs font-medium text-neutral-900 dark:text-white">
-                      {orderDetail.adresse_livraison.latitude && orderDetail.adresse_livraison.longitude
-                        ? `${orderDetail.adresse_livraison.latitude}, ${orderDetail.adresse_livraison.longitude}`
-                        : orderDetail.adresse_livraison.latitude || orderDetail.adresse_livraison.longitude || "Non disponible"}
-                    </p>
-                  </div>
-                )}
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-1">
+                    Coordonnées GPS
+                  </label>
+                  <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                    {orderDetail.adresse_livraison.latitude && orderDetail.adresse_livraison.longitude
+                      ? `${orderDetail.adresse_livraison.latitude}, ${orderDetail.adresse_livraison.longitude}`
+                      : "Non disponible"}
+                  </p>
+                </div>
 
                 {/* Contacts pour la livraison */}
-                {(orderDetail.adresse_livraison.contact1 || orderDetail.adresse_livraison.contact2) && (
-                  <div className="md:col-span-2 pt-4 border-t border-neutral-200 dark:border-gray-700">
-                    <label className="text-sm font-medium text-neutral-900 dark:text-white mb-2 block">
-                      Contacts pour la livraison
-                    </label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {orderDetail.adresse_livraison.contact1 && (
-                        <div>
-                          <label className="text-xs text-neutral-900 dark:text-white">
-                            Contact principal
-                          </label>
-                          <p className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">
-                            {orderDetail.adresse_livraison.contact1}
-                          </p>
-                        </div>
-                      )}
-                      {orderDetail.adresse_livraison.contact2 && (
-                        <div>
-                          <label className="text-xs text-neutral-900 dark:text-white">
-                            Contact secondaire
-                          </label>
-                          <p className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">
-                            {orderDetail.adresse_livraison.contact2}
-                          </p>
-                        </div>
-                      )}
+                <div className="md:col-span-2 lg:col-span-3 pt-4 border-t border-neutral-200 dark:border-gray-700">
+                  <label className="text-sm font-medium text-neutral-900 dark:text-white mb-2 block">
+                    Contacts pour la livraison
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-neutral-900 dark:text-white mb-1">
+                        Contact principal
+                      </label>
+                      <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                        {orderDetail.adresse_livraison.contact1 || "Non renseigné"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-neutral-900 dark:text-white mb-1">
+                        Contact secondaire
+                      </label>
+                      <p className="mt-1 text-xs font-medium text-neutral-600 dark:text-white">
+                        {orderDetail.adresse_livraison.contact2 || "Non renseigné"}
+                      </p>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             )}
           </div>
@@ -692,6 +786,18 @@ export default function OrderDetails() {
                   className="border border-neutral-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800/50 overflow-hidden"
               >
                   <div className="p-5">
+                    {/* ID du produit */}
+                    {product.id && (
+                      <div className="mb-2">
+                        <label className="text-xs font-medium text-neutral-500 dark:text-gray-400 mb-1">
+                          ID
+                        </label>
+                        <p className="text-xs font-medium text-neutral-600 dark:text-gray-300">
+                          {String(product.id)}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Catégorie en haut */}
                     {product.categorie && (
                       <div className="mb-4">
@@ -878,7 +984,8 @@ export default function OrderDetails() {
         <Button
           variant="primary"
           onClick={handlePrepare}
-          className="w-full sm:w-auto"
+          disabled={isPendingPayment()}
+          className="w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Préparer la commande
         </Button>

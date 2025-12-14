@@ -12,7 +12,7 @@ import PageBreadCrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import ComponentCard from "../../components/common/ComponentCard";
 import Button from "../../components/ui/button/Button";
-import { ChevronLeftIcon, PencilIcon, TrashBinIcon } from "../../icons";
+import { ChevronLeftIcon, PencilIcon } from "../../icons";
 import EditDeliveryPersonModal from "../../components/modals/EditDeliveryPersonModal";
 import deliveryService, { DeliveryPerson } from "../../services/api/deliveryService";
 
@@ -23,7 +23,6 @@ export default function DeliveryPersonDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   /**
    * Charger les détails du livreur depuis l'API
@@ -102,32 +101,6 @@ export default function DeliveryPersonDetails() {
       } finally {
         setLoading(false);
       }
-    }
-  };
-
-  /**
-   * Gère la suppression du livreur
-   */
-  const handleDelete = async () => {
-    if (!deliveryPerson) return;
-
-    const confirmMessage = `Êtes-vous sûr de vouloir supprimer le livreur ${deliveryPerson.prenoms} ${deliveryPerson.nom} ?`;
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-      await deliveryService.deleteDeliveryPerson(deliveryPerson.id);
-      // Rediriger vers la liste après suppression
-      navigate("/livreurs", { replace: true });
-    } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Une erreur est survenue lors de la suppression";
-      alert(errorMessage);
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -253,24 +226,13 @@ export default function DeliveryPersonDetails() {
 
       {/* Boutons d'action */}
       <div className="mb-6 flex items-center justify-end">
-        <div className="flex gap-3">
         <Button
           variant="primary"
-            onClick={handleOpenEditModal}
-          >
-            <PencilIcon className="mr-2 h-4 w-4" />
-            Modifier
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={handleDelete}
-            disabled={isDeleting}
+          onClick={handleOpenEditModal}
         >
-            <TrashBinIcon className="mr-2 h-4 w-4" />
-            {isDeleting ? "Suppression..." : "Supprimer"}
+          <PencilIcon className="mr-2 h-4 w-4" />
+          Modifier
         </Button>
-        </div>
       </div>
 
       {/* Informations du livreur */}

@@ -129,9 +129,9 @@ const AppHeader: React.FC = () => {
 
           <Link to="/" className="lg:hidden">
             <img
-              src="/Logo-Proxy-Market.png"
+              src="/Logo-Proxy-Deliery.png"
               alt="Proxy Market Logo"
-              className="h-12 sm:h-16 w-auto"
+              className="h-10 sm:h-12 w-auto"
             />
           </Link>
 

@@ -1,12 +1,84 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { MoreDotIcon } from "../../icons";
+import reportService from "../../services/api/reportService";
+
+/**
+ * Formate un montant en FCFA
+ */
+function formatCurrency(num: number): string {
+  return new Intl.NumberFormat('fr-FR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(num) + ' FCFA';
+}
 
 export default function MonthlyTarget() {
-  const series = [75.55];
+  const [loading, setLoading] = useState<boolean>(true);
+  const [targetData, setTargetData] = useState<{
+    percentage: number;
+    objective: number;
+    revenue: number;
+    today: number;
+    percentageChange: number;
+  }>({
+    percentage: 0,
+    objective: 0,
+    revenue: 0,
+    today: 0,
+    percentageChange: 0,
+  });
+
+  // Charger les statistiques depuis l'API
+  useEffect(() => {
+    const loadReports = async () => {
+      try {
+        setLoading(true);
+        const data = await reportService.getReports();
+        
+        const currentMonthRevenue = data.commandemois_soustotal || 0;
+        const lastMonthRevenue = data.commandeMoisPasse_soustotal || 0;
+        const todayRevenue = data.commande_to_day_soustotal || 0;
+        
+        // Calculer le pourcentage de progression
+        // Utiliser le mois passé comme objectif
+        const objective = lastMonthRevenue || currentMonthRevenue || 1;
+        const percentage = objective > 0 
+          ? Math.min(100, Math.round((currentMonthRevenue / objective) * 100))
+          : 0;
+        
+        // Calculer le pourcentage de changement
+        const percentageChange = lastMonthRevenue > 0
+          ? Math.round(((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
+          : 0;
+        
+        setTargetData({
+          percentage,
+          objective,
+          revenue: currentMonthRevenue,
+          today: todayRevenue,
+          percentageChange,
+        });
+      } catch (err) {
+        setTargetData({
+          percentage: 0,
+          objective: 0,
+          revenue: 0,
+          today: 0,
+          percentageChange: 0,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReports();
+  }, []);
+
+  const series = [targetData.percentage];
   const options: ApexOptions = {
     colors: ["#04b05d"],
     chart: {
@@ -54,6 +126,7 @@ export default function MonthlyTarget() {
     },
     labels: ["Progress"],
   };
+  
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
@@ -109,12 +182,24 @@ export default function MonthlyTarget() {
             />
           </div>
 
-          <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-[#04b05d]/10 px-3 py-1 text-xs font-medium text-[#04b05d] dark:bg-[#04b05d]/15 dark:text-[#04b05d]">
-            +10%
+          {targetData.percentageChange !== 0 && (
+            <span className={`absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full px-3 py-1 text-xs font-medium ${
+              targetData.percentageChange > 0
+                ? "bg-[#04b05d]/10 text-[#04b05d] dark:bg-[#04b05d]/15 dark:text-[#04b05d]"
+                : "bg-red-500/10 text-red-500 dark:bg-red-500/15 dark:text-red-500"
+            }`}>
+              {targetData.percentageChange > 0 ? "+" : ""}{targetData.percentageChange}%
           </span>
+          )}
         </div>
         <p className="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-          Vous avez gagné $3287 aujourd'hui, c'est plus qu'il y a un mois. Continuez votre excellent travail !
+          {loading ? (
+            "Chargement des données..."
+          ) : targetData.today > 0 ? (
+            `Vous avez gagné ${formatCurrency(targetData.today)} aujourd'hui${targetData.percentageChange > 0 ? ", c'est plus qu'il y a un mois" : ""}. Continuez votre excellent travail !`
+          ) : (
+            "Aucune vente aujourd'hui. Continuez vos efforts !"
+          )}
         </p>
       </div>
 
@@ -124,7 +209,8 @@ export default function MonthlyTarget() {
             Objectif
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {loading ? "..." : formatCurrency(targetData.objective)}
+            {targetData.percentageChange < 0 && (
             <svg
               width="16"
               height="16"
@@ -139,6 +225,7 @@ export default function MonthlyTarget() {
                 fill="#D92D20"
               />
             </svg>
+            )}
           </p>
         </div>
 
@@ -149,7 +236,8 @@ export default function MonthlyTarget() {
             Revenus
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {loading ? "..." : formatCurrency(targetData.revenue)}
+            {targetData.percentageChange > 0 && (
             <svg
               width="16"
               height="16"
@@ -164,6 +252,7 @@ export default function MonthlyTarget() {
                 fill="#039855"
               />
             </svg>
+            )}
           </p>
         </div>
 
@@ -174,7 +263,8 @@ export default function MonthlyTarget() {
             Aujourd'hui
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {loading ? "..." : formatCurrency(targetData.today)}
+            {targetData.today > 0 && (
             <svg
               width="16"
               height="16"
@@ -189,6 +279,7 @@ export default function MonthlyTarget() {
                 fill="#039855"
               />
             </svg>
+            )}
           </p>
         </div>
       </div>

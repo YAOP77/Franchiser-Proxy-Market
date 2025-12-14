@@ -3,7 +3,8 @@ import { ApexOptions } from "apexcharts";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { MoreDotIcon } from "../../icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import reportService from "../../services/api/reportService";
 
 export default function MonthlySalesChart() {
   const options: ApexOptions = {
@@ -85,13 +86,65 @@ export default function MonthlySalesChart() {
       },
     },
   };
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [salesData, setSalesData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
+  // Charger les statistiques depuis l'API
+  useEffect(() => {
+    const loadReports = async () => {
+      try {
+        setLoading(true);
+        const data = await reportService.getReports();
+        
+        const currentMonth = new Date().getMonth();
+        const monthlyData = new Array(12).fill(0);
+        
+        // Utiliser les vraies valeurs de l'API
+        // Mois actuel
+        monthlyData[currentMonth] = data.commandemois_soustotal || 0;
+        
+        // Mois passé (mois précédent)
+        const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        monthlyData[lastMonth] = data.commandeMoisPasse_soustotal || 0;
+        
+        // Calculer le total des autres mois (année - mois actuel - mois passé)
+        const totalYear = data.commandeannee_soustotal || 0;
+        const currentMonthValue = data.commandemois_soustotal || 0;
+        const lastMonthValue = data.commandeMoisPasse_soustotal || 0;
+        const remainingMonthsTotal = totalYear - currentMonthValue - lastMonthValue;
+        
+        // Répartir le reste sur les 10 autres mois de manière proportionnelle
+        const remainingMonths = 10; // 12 mois - mois actuel - mois passé
+        const averageForOtherMonths = remainingMonths > 0 
+          ? Math.floor(remainingMonthsTotal / remainingMonths) 
+          : 0;
+        
+        // Remplir les autres mois avec la moyenne
+        for (let i = 0; i < 12; i++) {
+          if (i !== currentMonth && i !== lastMonth) {
+            monthlyData[i] = averageForOtherMonths;
+          }
+        }
+        
+        setSalesData(monthlyData);
+      } catch (err) {
+        // En cas d'erreur, garder les valeurs à 0
+        setSalesData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReports();
+  }, []);
+
   const series = [
     {
       name: "Ventes",
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      data: salesData,
     },
   ];
-  const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
     setIsOpen(!isOpen);

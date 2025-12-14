@@ -230,9 +230,9 @@ export default function NotificationDropdown() {
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Notifications
-            </h5>
+          <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Notifications
+          </h5>
             {unreadCount > 0 && (
               <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-white bg-orange-500 rounded-full">
                 {unreadCount}
@@ -289,12 +289,12 @@ export default function NotificationDropdown() {
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" 
                   />
                 </svg>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                   Aucune notification pour le moment
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   Les nouvelles commandes apparaîtront ici
-                </p>
+              </p>
               </div>
             </li>
           ) : (
@@ -302,11 +302,11 @@ export default function NotificationDropdown() {
               const typeStyle = getNotificationTypeStyle(notification.type);
               
               return (
-                <li key={notification.id}>
-                  <DropdownItem
-                    tag="a"
-                    to={`/order/${notification.orderId}`}
-                    onItemClick={() => handleNotificationClick(notification.id)}
+              <li key={notification.id}>
+                <DropdownItem
+                  tag="a"
+                  to={`/order/${notification.orderId}`}
+                  onItemClick={() => handleNotificationClick(notification.id)}
                     className={`flex gap-3 rounded-lg p-3 transition-colors ${
                       !notification.isRead 
                         ? "bg-gray-50 dark:bg-gray-800/50 border-l-2 border-orange-500" 
@@ -325,7 +325,7 @@ export default function NotificationDropdown() {
                         {" "}
                         <span className="text-gray-600 dark:text-gray-400">{notification.message}</span>
                       </p>
-                      
+
                       {/* Numéro de commande et date */}
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>Commande {notification.orderNumber}</span>
@@ -334,24 +334,24 @@ export default function NotificationDropdown() {
                       </div>
                     </div>
 
-                    {/* Badge pour nouvelles notifications */}
-                    {notification.isNew && !notification.isRead && (
+                  {/* Badge pour nouvelles notifications */}
+                  {notification.isNew && !notification.isRead && (
                       <span className="h-2 w-2 rounded-full bg-orange-500 flex-shrink-0 mt-1"></span>
-                    )}
-                  </DropdownItem>
-                </li>
+                  )}
+                </DropdownItem>
+              </li>
               );
             })
           )}
         </ul>
         {allNotifications.length > 0 && (
-          <Link
-            to="/commandes"
+        <Link
+          to="/commandes"
             className="block px-4 py-2 mt-2 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
-            onClick={closeDropdown}
-          >
-            Voir toutes les notifications
-          </Link>
+          onClick={closeDropdown}
+        >
+          Voir toutes les notifications
+        </Link>
         )}
       </Dropdown>
     </div>

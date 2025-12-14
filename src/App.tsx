@@ -21,6 +21,7 @@ import { GoogleMapsProvider } from "./contexts/GoogleMapsContext";
 
 // Pages avec layout
 import Home from "./pages/Dashboard/Home";
+import Statistics from "./pages/Dashboard/Statistics";
 import MesProduitsPage from "./pages/Products/MesProduitsPage";
 import MonStorePage from "./pages/Store/MonStorePage";
 import OrdersList from "./pages/Orders/OrdersList";
@@ -69,6 +70,7 @@ export default function App() {
             {/* Dashboard */}
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
+            <Route path="/statistics" element={<Statistics />} />
 
             {/* Pages boutique */}
             <Route path="/produits" element={<MesProduitsPage />} />

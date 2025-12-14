@@ -265,9 +265,9 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             /* Logo Proxy Market (sidebar étendue) */
             <img
-              src="/Logo-Proxy-Market.png"
+              src="/Logo-Proxy-Deliery.png"
               alt={`${APP_CONFIG.name} Logo`}
-              className="h-16 sm:h-20 lg:h-14 w-auto"
+              className="h-12 sm:h-16 lg:h-11 w-auto"
             />
           ) : (
             /* Logo Proxy Market (sidebar réduite) */

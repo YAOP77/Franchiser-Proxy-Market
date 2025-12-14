@@ -191,11 +191,13 @@ export default function OrdersList() {
   };
 
   /**
-   * Normalise le texte du statut (remplace "Commande En cours de préparation" par "En cours de préparation")
+   * Normalise le texte du statut (remplace "Commande En cours de préparation" par "En cours de préparation" et "Commande en attente de paiement" par "En attente de paiement")
    */
   const normalizeStatusText = (statusText: string | undefined): string => {
     if (!statusText) return "En attente";
-    return statusText.replace(/Commande\s+En\s+cours\s+de\s+préparation/gi, 'En cours de préparation');
+    let normalized = statusText.replace(/Commande\s+En\s+cours\s+de\s+préparation/gi, 'En cours de préparation');
+    normalized = normalized.replace(/Commande\s+en\s+attente\s+de\s+paiement/gi, 'En attente de paiement');
+    return normalized;
   };
 
   /**
@@ -212,7 +214,20 @@ export default function OrdersList() {
                                statusLower.includes('pending payment') ||
                                status === 'Commande en attente de paiement';
       
+      // Vérifier si c'est "Commande payée"
+      const isPaid = statusLower.includes('payée') || 
+                     statusLower.includes('paid') ||
+                     status === 'Commande payée';
+      
       const normalizedStatus = normalizeStatusText(status);
+      
+      // "Commande payée" - couleur blue avec bordure
+      if (isPaid) {
+        return { 
+          text: normalizedStatus, 
+          color: 'bg-blue-100 border border-blue-600 text-blue-800 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-200'
+        };
+      }
       
       if (statusLower.includes('livré') || statusLower.includes('delivered')) {
         return { text: normalizedStatus, color: 'bg-green-100 border border-green-600  text-green-800 dark:bg-green-900/30 dark:border-green-500 dark:text-green-200' };
@@ -227,7 +242,7 @@ export default function OrdersList() {
         if (isPendingPayment) {
           return { 
             text: normalizedStatus, 
-            color: 'bg-yellow-100 border border-yellow-400 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-200',
+            color: 'bg-yellow-200 border border-yellow-600 text-yellow-800 dark:bg-yellow-900/40 dark:border-yellow-600 dark:text-yellow-200',
             isPendingPayment: true
           };
         }
@@ -560,7 +575,7 @@ export default function OrdersList() {
                             
                             {/* Quantité */}
                             <td className="px-4 py-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 border border-blue-400 text-blue-700 dark:bg-blue-700 dark:text-gray-300">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 border border-gray-400 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                                 {getTotalQuantity(order)}
                       </span>
                     </td>
@@ -685,7 +700,7 @@ export default function OrdersList() {
                             
                             {/* Quantité */}
                             <td className="px-4 py-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 border border-blue-400 text-blue-700 dark:bg-blue-700 dark:text-gray-300">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 border border-gray-400 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                                 {getTotalQuantity(order)}
                       </span>
                     </td>
