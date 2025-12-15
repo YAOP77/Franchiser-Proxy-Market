@@ -250,15 +250,24 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   /**
    * Rafraîchit les notifications depuis l'API
    * Détecte les nouvelles commandes et les changements de statut
+   * Synchronise les notifications avec les commandes de la boutique connectée
    */
   const refreshNotifications = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Récupérer les commandes récentes (première page)
+      // Récupérer les commandes récentes (première page) - déjà filtrées par boutique par l'API
       const response = await orderService.getOrders(1);
       const orders = response.data;
 
+      // Créer un Set des IDs de commandes actuelles pour filtrage rapide
+      const currentOrderIds = new Set<string>(
+        orders ? orders.map((o) => String(o.id)) : []
+      );
+
+      // Si aucune commande n'est retournée, vider toutes les notifications
       if (!orders || orders.length === 0) {
+        setNotifications([]);
+        saveNotifications([]);
         setIsLoading(false);
         return;
       }
@@ -389,27 +398,35 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         setLastOrderStatuses(updatedStatuses);
         saveLastStatuses(updatedStatuses);
 
-        // Mettre à jour les notifications existantes avec les nouveaux statuts
-        const updatedPrev = prev.map((notif) => {
-          const order = orders.find((o) => String(o.id) === String(notif.orderId));
-          if (!order) return notif;
-          
-          const currentStatus = order.status_text || String(order.status);
-          const statusLower = currentStatus.toLowerCase();
-          const isDelivered = statusLower.includes("livré") || statusLower.includes("delivered");
-          
-          // Si la notification est "new_order" mais la commande est maintenant livrée, mettre à jour
-          if (notif.type === "new_order" && isDelivered && notif.status !== currentStatus) {
-            return {
-              ...notif,
-              type: "delivered" as NotificationType,
-              message: "a été livrée avec succès",
-              status: currentStatus,
-            };
-          }
-          
-          return notif;
-        });
+        // Filtrer les notifications existantes pour ne garder que celles qui correspondent aux commandes actuelles
+        // et mettre à jour leurs statuts si nécessaire
+        const updatedPrev = prev
+          .filter((notif) => {
+            // Ne garder que les notifications pour les commandes qui existent encore dans la boutique
+            return currentOrderIds.has(String(notif.orderId));
+          })
+          .map((notif) => {
+            const order = orders.find((o) => String(o.id) === String(notif.orderId));
+            // Cette vérification est redondante après le filter, mais on la garde pour la sécurité
+            if (!order) return null;
+            
+            const currentStatus = order.status_text || String(order.status);
+            const statusLower = currentStatus.toLowerCase();
+            const isDelivered = statusLower.includes("livré") || statusLower.includes("delivered");
+            
+            // Si la notification est "new_order" mais la commande est maintenant livrée, mettre à jour
+            if (notif.type === "new_order" && isDelivered && notif.status !== currentStatus) {
+              return {
+                ...notif,
+                type: "delivered" as NotificationType,
+                message: "a été livrée avec succès",
+                status: currentStatus,
+              };
+            }
+            
+            return notif;
+          })
+          .filter((notif): notif is Notification => notif !== null);
 
         // Combiner les nouvelles notifications avec les notifications mises à jour
         const combined = [...newNotifications, ...updatedPrev];
@@ -447,12 +464,14 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 
   /**
    * Rafraîchit les notifications périodiquement
+   * Synchronise automatiquement les notifications avec les commandes de la boutique connectée
    */
   useEffect(() => {
-    // Rafraîchir immédiatement
+    // Rafraîchir immédiatement au chargement pour synchroniser avec les commandes actuelles
+    // Cela filtre automatiquement les notifications pour ne garder que celles de la boutique
     refreshNotifications();
 
-    // Rafraîchir toutes les 30 secondes
+    // Rafraîchir toutes les 30 secondes pour maintenir la synchronisation
     const interval = setInterval(() => {
       refreshNotifications();
     }, 30000);

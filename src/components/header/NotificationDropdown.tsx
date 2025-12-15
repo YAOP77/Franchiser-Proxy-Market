@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Link } from "react-router";
-import { useNotifications, NotificationType } from "../../context/NotificationContext";
+import { useNotifications, NotificationType, formatRelativeTime } from "../../context/NotificationContext";
 
 /**
  * Composant d'icône SVG pour nouvelle commande
@@ -102,10 +102,36 @@ const StatusChangeIcon = ({ className }: { className?: string }) => (
 );
 
 /**
- * Formate la date en heure:minute
+ * Formate la date complète (jour, mois, année, heure, minute)
  */
-const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString("fr-FR", {
+const formatFullDate = (date: Date): string => {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const notificationDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  
+  // Si c'est aujourd'hui, afficher seulement l'heure
+  if (notificationDate.getTime() === today.getTime()) {
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  
+  // Si c'est hier
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (notificationDate.getTime() === yesterday.getTime()) {
+    return `Hier à ${date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  }
+  
+  // Sinon, afficher la date complète
+  return date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -326,11 +352,9 @@ export default function NotificationDropdown() {
                         <span className="text-gray-600 dark:text-gray-400">{notification.message}</span>
                       </p>
 
-                      {/* Numéro de commande et date */}
+                      {/* Date de la commande */}
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        <span>Commande {notification.orderNumber}</span>
-                        <span>•</span>
-                        <span>{formatTime(notification.timestamp)}</span>
+                        <span>{formatFullDate(notification.timestamp)}</span>
                       </div>
                     </div>
 
