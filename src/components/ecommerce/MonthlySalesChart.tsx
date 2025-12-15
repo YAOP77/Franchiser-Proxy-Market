@@ -87,14 +87,12 @@ export default function MonthlySalesChart() {
     },
   };
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [salesData, setSalesData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
   // Charger les statistiques depuis l'API
   useEffect(() => {
     const loadReports = async () => {
       try {
-        setLoading(true);
         const data = await reportService.getReports();
         
         const currentMonth = new Date().getMonth();
@@ -131,8 +129,6 @@ export default function MonthlySalesChart() {
       } catch (err) {
         // En cas d'erreur, garder les valeurs à 0
         setSalesData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-      } finally {
-        setLoading(false);
       }
     };
 

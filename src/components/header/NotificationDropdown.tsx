@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Link } from "react-router";
-import { useNotifications, NotificationType, formatRelativeTime } from "../../context/NotificationContext";
+import { useNotifications, NotificationType } from "../../context/NotificationContext";
 
 /**
  * Composant d'icône SVG pour nouvelle commande

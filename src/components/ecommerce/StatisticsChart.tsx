@@ -6,7 +6,6 @@ import reportService from "../../services/api/reportService";
 
 export default function StatisticsChart() {
   const [selectedPeriod, setSelectedPeriod] = useState<ChartPeriod>("monthly");
-  const [loading, setLoading] = useState<boolean>(true);
   const [reportsData, setReportsData] = useState<{
     monthly: { ventes: number[]; revenus: number[] };
     quarterly: { ventes: number[]; revenus: number[] };
@@ -21,7 +20,6 @@ export default function StatisticsChart() {
   useEffect(() => {
     const loadReports = async () => {
       try {
-        setLoading(true);
         const data = await reportService.getReports();
         
         // Données mensuelles (12 mois)
@@ -103,8 +101,6 @@ export default function StatisticsChart() {
           quarterly: { ventes: [0, 0, 0, 0], revenus: [0, 0, 0, 0] },
           annually: { ventes: [0], revenus: [0] },
         });
-      } finally {
-        setLoading(false);
       }
     };
 

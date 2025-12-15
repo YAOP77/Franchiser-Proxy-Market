@@ -86,7 +86,6 @@ function formatCurrency(num: number): string {
  */
 export default function EcommerceMetrics() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
   const [reports, setReports] = useState<{
     stock: number;
     livreurs: number;
@@ -104,7 +103,6 @@ export default function EcommerceMetrics() {
     const loadReports = async () => {
       try {
         setLoading(true);
-        setError("");
         const data = await reportService.getReports();
         
         setReports({
@@ -114,10 +112,6 @@ export default function EcommerceMetrics() {
           ventes: data.commandeannee_soustotal || 0,
         });
       } catch (err) {
-        const errorMessage = err instanceof Error 
-          ? err.message 
-          : "Une erreur est survenue lors du chargement des statistiques";
-        setError(errorMessage);
         // En cas d'erreur, garder les valeurs à 0
         setReports({
           stock: 0,

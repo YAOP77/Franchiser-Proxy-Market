@@ -5,7 +5,6 @@ import ComponentCard from "../components/common/ComponentCard";
 import Badge from "../components/ui/badge/Badge";
 import { useAuth } from "../context/AuthContext";
 import adminService, { Admin } from "../services/api/adminService";
-import franchiseService from "../services/api/franchiseService";
 import apiClient from "../services/api/axiosConfig";
 
 interface BoutiqueData {

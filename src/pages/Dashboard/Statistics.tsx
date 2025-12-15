@@ -195,9 +195,9 @@ export default function Statistics() {
         {/* Breadcrumb */}
         <PageBreadCrumb
           items={[
-            { label: "Home", path: "/" },
-            { label: "Dashboard", path: "/" },
-            { label: "Statistique", path: "/statistics" },
+            { label: "Home", href: "/" },
+            { label: "Dashboard", href: "/" },
+            { label: "Statistique", href: "/statistics" },
           ]}
         />
 
@@ -360,7 +360,11 @@ export default function Statistics() {
                                   {product.libelle}
                                 </div>
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                  {product.categorie?.libelle || "Sans catégorie"}
+                                  {typeof product.categorie === 'object' && product.categorie?.libelle 
+                                    ? product.categorie.libelle 
+                                    : typeof product.categorie === 'string' 
+                                      ? product.categorie 
+                                      : product.categorie_name || "Sans catégorie"}
                                 </div>
                               </div>
                             ))}
@@ -419,7 +423,11 @@ export default function Statistics() {
                                         {product.libelle}
                                       </div>
                                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {product.categorie?.libelle || "Sans catégorie"}
+                                        {typeof product.categorie === 'object' && product.categorie?.libelle 
+                                          ? product.categorie.libelle 
+                                          : typeof product.categorie === 'string' 
+                                            ? product.categorie 
+                                            : product.categorie_name || "Sans catégorie"}
                                       </div>
                                     </div>
                                     <div className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-300">
