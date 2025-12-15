@@ -100,30 +100,30 @@ export default function MonthlySalesChart() {
         const currentMonth = new Date().getMonth();
         const monthlyData = new Array(12).fill(0);
         
-        // Utiliser les vraies valeurs de l'API
+        // Utiliser les vraies valeurs de ventes (nombre de commandes) de l'API
         // Mois actuel
-        monthlyData[currentMonth] = data.commandemois_soustotal || 0;
+        monthlyData[currentMonth] = data.commandemois || 0;
         
         // Mois passé (mois précédent)
         const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-        monthlyData[lastMonth] = data.commandeMoisPasse_soustotal || 0;
+        monthlyData[lastMonth] = data.commandeMoisPasse || 0;
         
-        // Calculer le total des autres mois (année - mois actuel - mois passé)
-        const totalYear = data.commandeannee_soustotal || 0;
-        const currentMonthValue = data.commandemois_soustotal || 0;
-        const lastMonthValue = data.commandeMoisPasse_soustotal || 0;
-        const remainingMonthsTotal = totalYear - currentMonthValue - lastMonthValue;
+        // Calculer le total des autres mois pour les ventes (année - mois actuel - mois passé)
+        const totalYearOrders = data.commandeannee || 0;
+        const currentMonthOrders = data.commandemois || 0;
+        const lastMonthOrders = data.commandeMoisPasse || 0;
+        const remainingMonthsOrdersTotal = totalYearOrders - currentMonthOrders - lastMonthOrders;
         
         // Répartir le reste sur les 10 autres mois de manière proportionnelle
         const remainingMonths = 10; // 12 mois - mois actuel - mois passé
-        const averageForOtherMonths = remainingMonths > 0 
-          ? Math.floor(remainingMonthsTotal / remainingMonths) 
+        const averageOrdersForOtherMonths = remainingMonths > 0
+          ? Math.floor(remainingMonthsOrdersTotal / remainingMonths)
           : 0;
         
         // Remplir les autres mois avec la moyenne
         for (let i = 0; i < 12; i++) {
           if (i !== currentMonth && i !== lastMonth) {
-            monthlyData[i] = averageForOtherMonths;
+            monthlyData[i] = averageOrdersForOtherMonths;
           }
         }
         
