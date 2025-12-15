@@ -194,10 +194,10 @@ export default function Statistics() {
       <div className="space-y-6">
         {/* Breadcrumb */}
         <PageBreadCrumb
+          pageTitle="Statistiques"
           items={[
             { label: "Home", href: "/" },
             { label: "Dashboard", href: "/" },
-            { label: "Statistique", href: "/statistics" },
           ]}
         />
 
